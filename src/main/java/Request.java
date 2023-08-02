@@ -1,25 +1,21 @@
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
+import org.apache.http.NameValuePair;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class Request {
     private String method;
     private String path;
 
-    public Request(String method, String path) {
+    private List<NameValuePair> paramsQuery;
+    private List<NameValuePair> paramsPost;
+
+    public Request(String method, String path, List<NameValuePair> paramsQuery, List<NameValuePair> contentType) {
         this.method = method;
         this.path = path;
+        this.paramsQuery = paramsQuery;
+        this.paramsPost = contentType;
 
-    }
-
-    public static Request RequestParser(BufferedReader in, BufferedOutputStream out) throws IOException {
-        var requestLine = in.readLine();
-        var split = requestLine.split(" ");
-        if (split.length != 3) {
-            Server.notFound(out);
-        }
-        return new Request(split[0], split[1]);
     }
 
     public String getPath() {
@@ -30,4 +26,30 @@ public class Request {
         return method;
     }
 
+    public NameValuePair getQueryParam(String name) {
+        return this.paramsQuery.stream().filter(s -> s.getName().equals(name)).findFirst().get();
+    }
+
+    public List<NameValuePair> getQueryParams() {
+        return this.paramsQuery;
+    }
+
+    public NameValuePair getPostParam(String name) {
+        return this.paramsPost.stream().filter(s -> s.getName().equals(name)).findFirst().get();
+    }
+
+    public List<NameValuePair> getPostParams() {
+        return this.paramsPost;
+    }
+
+    @Override
+    public String toString() {
+        return "Request{" +
+                "method='" + method + '\'' +
+                ", path='" + path + '\'' +
+                ", paramsQuery=" + paramsQuery +
+                ", contentType=" + paramsPost +
+                '}';
+    }
 }
+
